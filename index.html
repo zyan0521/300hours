@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>三百小时计划</title>
+    <link rel="manifest" href="manifest.json" />
+    <meta name="theme-color" content="#1f8a7a" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <link rel="apple-touch-icon" href="icon.svg" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Fraunces:wght@400;600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="app">
+      <header class="hero">
+        <h1>三百小时计划</h1>
+        <p class="hero-sub">任务计时 · 累计进度</p>
+      </header>
+
+      <main>
+        <section id="list-view" class="view is-active">
+          <div class="list-header">
+            <div>
+              <h2>我的任务</h2>
+              <p class="muted">创建任务，开始累计时长。</p>
+            </div>
+            <button id="add-task-button" class="primary">新建任务</button>
+          </div>
+
+          <form id="task-form" class="task-form is-hidden">
+            <label>
+              <span>任务名称</span>
+              <input
+                id="task-name"
+                type="text"
+                placeholder="比如：学吉他"
+                maxlength="24"
+                required
+              />
+            </label>
+            <div class="form-actions">
+              <button type="submit" class="primary">创建</button>
+              <button type="button" id="cancel-task" class="ghost">取消</button>
+            </div>
+          </form>
+
+          <div id="task-list" class="task-list"></div>
+        </section>
+
+        <section id="timer-view" class="view">
+          <div class="timer-shell">
+            <div class="timer-top">
+              <div class="timer-brand">三百小时计划</div>
+              <div class="task-picker">
+                <label for="timer-task-select">选择任务</label>
+                <select id="timer-task-select"></select>
+              </div>
+            </div>
+
+            <div id="timer-card" class="timer-card">
+              <div id="timer-progress" class="timer-progress">
+                <div class="progress-core">
+                  <div class="session-time" id="session-time">00:00:00</div>
+                  <div class="timer-task" id="timer-task-name">未选择任务</div>
+                </div>
+              </div>
+
+              <div class="timer-meta">
+                <div>
+                  <span class="meta-label">已累计</span>
+                  <span class="meta-value" id="timer-total">0h 0m</span>
+                </div>
+                <div>
+                  <span class="meta-label">完成度</span>
+                  <span class="meta-value" id="timer-percent">0.0%</span>
+                </div>
+              </div>
+              <div id="timer-hint" class="hint"></div>
+              <div class="timer-actions">
+                <button id="start-button" class="primary">开始计时</button>
+                <button id="stop-button" class="secondary">停止并记录</button>
+              </div>
+            </div>
+          </div>
+        </section>
+      </main>
+
+      <nav class="tab-bar" aria-label="底部导航">
+        <button id="tab-list" class="tab-button is-active" data-view="list">任务</button>
+        <button id="tab-timer" class="tab-button" data-view="timer">计时</button>
+      </nav>
+    </div>
+
+    <div
+      id="confirm-modal"
+      class="modal is-hidden"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="modal-title"
+    >
+      <div class="modal-backdrop" data-modal-close></div>
+      <div class="modal-panel" role="document">
+        <div class="modal-header">
+          <h3 id="modal-title">删除任务</h3>
+          <p id="modal-body"></p>
+        </div>
+        <div class="modal-actions">
+          <button id="modal-cancel" class="ghost">取消</button>
+          <button id="modal-confirm" class="secondary">删除</button>
+        </div>
+      </div>
+    </div>
+
+    <script src="app.js"></script>
+    <script>
+      if ("serviceWorker" in navigator) {
+        navigator.serviceWorker.register("sw.js");
+      }
+    </script>
+  </body>
+</html>

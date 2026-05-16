@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#1f8a7a"/>
+      <stop offset="100%" stop-color="#157060"/>
+    </linearGradient>
+  </defs>
+  <rect width="512" height="512" rx="96" fill="url(#bg)"/>
+  <circle cx="256" cy="230" r="130" fill="none" stroke="rgba(255,255,255,0.2)" stroke-width="28"/>
+  <path d="M256 100 A130 130 0 0 1 340 280"
+        fill="none" stroke="#fff" stroke-width="28" stroke-linecap="round"
+        stroke-dasharray="0 900"
+        transform="rotate(0 256 256)">
+    <animate attributeName="stroke-dasharray"
+             values="0 900;680 900"
+             dur="3s" begin="0s" fill="freeze" restart="whenNotActive"/>
+  </path>
+  <circle cx="256" cy="230" r="16" fill="#e5a62c"/>
+  <text x="256" y="420" text-anchor="middle"
+        font-family="system-ui,sans-serif" font-weight="700"
+        font-size="44" fill="#fff" letter-spacing="4">300h</text>
+</svg>

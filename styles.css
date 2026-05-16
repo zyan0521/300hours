@@ -295,7 +295,7 @@ button:active {
 
 
 .timer-card {
-  padding: 26px 16px 18px;
+  padding: 28px 16px 18px;
   border-radius: 26px;
   background: var(--card);
   border: 1px solid var(--stroke);
@@ -360,11 +360,17 @@ button:active {
 .task-picker select {
   width: 100%;
   border-radius: 14px;
-  padding: 10px 12px;
+  padding: 10px 38px 10px 12px;
   border: 1px solid var(--stroke);
   font-size: 15px;
   background: rgba(255, 255, 255, 0.9);
   color: var(--ink);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24'%3E%3Cpath d='M6 9l6 6 6-6' fill='none' stroke='%236b6257' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  background-size: 14px;
+  appearance: none;
+  -webkit-appearance: none;
 }
 
 .task-picker select:disabled {
@@ -431,8 +437,8 @@ button:active {
 
 .adjust-panel {
   position: absolute;
-  top: 12px;
-  right: 12px;
+  top: 14px;
+  right: 14px;
   border-radius: 999px;
   background: rgba(31, 29, 25, 0.06);
   border: 1px solid var(--stroke);
@@ -450,7 +456,7 @@ button:active {
   width: auto;
   border-radius: 999px;
   background: transparent;
-  padding: 6px 12px;
+  padding: 8px 14px;
   box-shadow: none;
   text-align: center;
   display: flex;
@@ -667,7 +673,7 @@ button:active {
 
   .timer-card {
     min-height: 320px;
-    padding: 22px 14px 16px;
+    padding: 24px 14px 16px;
   }
 
   .timer-progress {
@@ -688,8 +694,8 @@ button:active {
   }
 
   .adjust-panel {
-    top: 10px;
-    right: 10px;
+    top: 12px;
+    right: 12px;
   }
 
   .timer-actions {

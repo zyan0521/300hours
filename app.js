@@ -46,8 +46,6 @@ let activeTaskId = null;
 let longPressTimer = null;
 let longPressTaskId = null;
 let pendingDeleteId = null;
-let adjustPressTimer = null;
-let lastAdjustPointerType = null;
 
 function loadTasks() {
   const raw = localStorage.getItem(STORAGE_KEYS.tasks);
@@ -129,12 +127,6 @@ function resetAdjustInputs() {
   adjustMinutes.value = "0";
 }
 
-function clearAdjustPress() {
-  if (adjustPressTimer) {
-    clearTimeout(adjustPressTimer);
-    adjustPressTimer = null;
-  }
-}
 
 function updateBodyModalState() {
   const hasConfirmOpen = confirmModal && !confirmModal.classList.contains("is-hidden");
@@ -577,50 +569,11 @@ adjustHours.addEventListener("change", normalizeAdjustInputs);
 adjustMinutes.addEventListener("change", normalizeAdjustInputs);
 
 if (adjustToggle) {
-  adjustToggle.addEventListener("pointerdown", (event) => {
-    if (adjustToggle.disabled) {
-      return;
-    }
-    lastAdjustPointerType = event.pointerType || null;
-    clearAdjustPress();
-    if (event.pointerType === "touch") {
-      adjustPressTimer = window.setTimeout(() => {
-        setAdjustModalOpen(true);
-        clearAdjustPress();
-      }, 450);
-    }
-  });
-
-  adjustToggle.addEventListener("pointerup", () => {
-    clearAdjustPress();
-  });
-
-  adjustToggle.addEventListener("pointerleave", () => {
-    clearAdjustPress();
-  });
-
-  adjustToggle.addEventListener("pointercancel", () => {
-    clearAdjustPress();
-  });
-
   adjustToggle.addEventListener("click", () => {
     if (adjustToggle.disabled) {
       return;
     }
-    if (lastAdjustPointerType === "touch") {
-      return;
-    }
     setAdjustModalOpen(true);
-  });
-
-  adjustToggle.addEventListener("keydown", (event) => {
-    if (adjustToggle.disabled) {
-      return;
-    }
-    if (event.key === "Enter" || event.key === " ") {
-      event.preventDefault();
-      setAdjustModalOpen(true);
-    }
   });
 }
 

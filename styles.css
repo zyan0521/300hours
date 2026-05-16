@@ -399,6 +399,113 @@ button:active {
   font-weight: 600;
 }
 
+.adjust-panel {
+  width: 100%;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.6);
+  border: 1px solid var(--stroke);
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+  overflow: hidden;
+}
+
+.adjust-panel.is-disabled {
+  opacity: 0.7;
+}
+
+.adjust-toggle {
+  width: 100%;
+  border-radius: 0;
+  background: transparent;
+  padding: 12px 14px;
+  box-shadow: none;
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.adjust-toggle:disabled {
+  cursor: not-allowed;
+}
+
+.adjust-toggle-main {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.adjust-title {
+  font-weight: 600;
+}
+
+.adjust-note {
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.adjust-chevron {
+  height: 10px;
+  width: 10px;
+  border-right: 2px solid var(--muted);
+  border-bottom: 2px solid var(--muted);
+  transform: rotate(45deg);
+  transition: transform 0.2s ease;
+}
+
+.adjust-panel.is-open .adjust-chevron {
+  transform: rotate(225deg);
+}
+
+.adjust-body {
+  padding: 0 14px 14px;
+  display: none;
+  flex-direction: column;
+  gap: 12px;
+  border-top: 1px solid var(--stroke);
+}
+
+.adjust-panel.is-open .adjust-body {
+  display: flex;
+}
+
+.adjust-inputs {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.adjust-inputs label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  font-weight: 600;
+}
+
+.adjust-inputs input {
+  border-radius: 14px;
+  padding: 10px 12px;
+  border: 1px solid var(--stroke);
+  font-size: 15px;
+  background: rgba(255, 255, 255, 0.9);
+  color: var(--ink);
+}
+
+.adjust-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.adjust-actions button {
+  flex: 1;
+}
+
 .hint {
   min-height: 20px;
   color: var(--accent);

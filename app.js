@@ -21,6 +21,14 @@ const timerPercent = document.getElementById("timer-percent");
 const timerHint = document.getElementById("timer-hint");
 const startButton = document.getElementById("start-button");
 const stopButton = document.getElementById("stop-button");
+const adjustPanel = document.getElementById("adjust-panel");
+const adjustToggle = document.getElementById("adjust-toggle");
+const adjustBody = document.getElementById("adjust-body");
+const adjustNote = document.getElementById("adjust-note");
+const adjustHours = document.getElementById("adjust-hours");
+const adjustMinutes = document.getElementById("adjust-minutes");
+const adjustAdd = document.getElementById("adjust-add");
+const adjustSubtract = document.getElementById("adjust-subtract");
 const timerProgress = document.getElementById("timer-progress");
 const tabListButton = document.getElementById("tab-list");
 const tabTimerButton = document.getElementById("tab-timer");
@@ -93,6 +101,53 @@ function formatHoursMinutes(ms) {
 function formatPercent(ms) {
   const percent = Math.min(ms / GOAL_MS, 1) * 100;
   return `${percent.toFixed(1)}%`;
+}
+
+function clampNumber(value, min, max) {
+  return Math.min(Math.max(value, min), max);
+}
+
+function getAdjustMsFromInputs() {
+  const hours = clampNumber(Number.parseInt(adjustHours.value, 10) || 0, 0, 999);
+  const minutes = clampNumber(Number.parseInt(adjustMinutes.value, 10) || 0, 0, 59);
+  return (hours * 60 + minutes) * 60000;
+}
+
+function normalizeAdjustInputs() {
+  const hours = clampNumber(Number.parseInt(adjustHours.value, 10) || 0, 0, 999);
+  const minutes = clampNumber(Number.parseInt(adjustMinutes.value, 10) || 0, 0, 59);
+  adjustHours.value = String(hours);
+  adjustMinutes.value = String(minutes);
+}
+
+function resetAdjustInputs() {
+  adjustHours.value = "0";
+  adjustMinutes.value = "0";
+}
+
+function setAdjustExpanded(expanded) {
+  if (!adjustPanel || !adjustToggle || !adjustBody) {
+    return;
+  }
+  adjustPanel.classList.toggle("is-open", expanded);
+  adjustToggle.setAttribute("aria-expanded", String(expanded));
+  adjustBody.hidden = !expanded;
+}
+
+function setAdjustDisabled(disabled) {
+  adjustHours.disabled = disabled;
+  adjustMinutes.disabled = disabled;
+  adjustAdd.disabled = disabled;
+  adjustSubtract.disabled = disabled;
+  if (adjustToggle) {
+    adjustToggle.disabled = disabled;
+  }
+  if (adjustPanel) {
+    adjustPanel.classList.toggle("is-disabled", disabled);
+  }
+  if (disabled) {
+    setAdjustExpanded(false);
+  }
 }
 
 function getTaskById(taskId) {
@@ -289,6 +344,10 @@ function renderTimer() {
     timerProgress.style.setProperty("--timer-progress", "0%");
     startButton.disabled = true;
     stopButton.disabled = true;
+    if (adjustNote) {
+      adjustNote.textContent = hasTasks ? "请选择任务后可调整" : "先创建任务";
+    }
+    setAdjustDisabled(true);
     return;
   }
 
@@ -314,6 +373,10 @@ function renderTimer() {
 
   startButton.disabled = isRunningThis || hasOtherRunning;
   stopButton.disabled = !isRunningThis;
+  if (adjustNote) {
+    adjustNote.textContent = timerState.running ? "停止计时后可调整" : "可手动补记或扣除";
+  }
+  setAdjustDisabled(timerState.running);
 }
 
 function updateTitle() {
@@ -476,11 +539,65 @@ stopButton.addEventListener("click", () => {
   updateTitle();
 });
 
+adjustHours.addEventListener("change", normalizeAdjustInputs);
+adjustMinutes.addEventListener("change", normalizeAdjustInputs);
+
+if (adjustToggle) {
+  adjustToggle.addEventListener("click", () => {
+    if (adjustToggle.disabled) {
+      return;
+    }
+    const isOpen = adjustPanel ? adjustPanel.classList.contains("is-open") : false;
+    setAdjustExpanded(!isOpen);
+  });
+}
+
+adjustAdd.addEventListener("click", () => {
+  if (timerState.running) {
+    return;
+  }
+  const deltaMs = getAdjustMsFromInputs();
+  if (!activeTaskId || deltaMs === 0) {
+    return;
+  }
+  const task = getTaskById(activeTaskId);
+  if (!task) {
+    return;
+  }
+  task.totalMs += deltaMs;
+  saveTasks();
+  resetAdjustInputs();
+  renderTimer();
+  renderList();
+  updateTitle();
+});
+
+adjustSubtract.addEventListener("click", () => {
+  if (timerState.running) {
+    return;
+  }
+  const deltaMs = getAdjustMsFromInputs();
+  if (!activeTaskId || deltaMs === 0) {
+    return;
+  }
+  const task = getTaskById(activeTaskId);
+  if (!task) {
+    return;
+  }
+  task.totalMs = Math.max(0, task.totalMs - deltaMs);
+  saveTasks();
+  resetAdjustInputs();
+  renderTimer();
+  renderList();
+  updateTitle();
+});
+
 renderList();
 if (timerState.running) {
   activeTaskId = timerState.taskId;
   showView("timer");
 }
 renderTimer();
+setAdjustExpanded(false);
 updateTitle();
 setInterval(tick, 1000);

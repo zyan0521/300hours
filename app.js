@@ -23,8 +23,10 @@ const startButton = document.getElementById("start-button");
 const stopButton = document.getElementById("stop-button");
 const adjustPanel = document.getElementById("adjust-panel");
 const adjustToggle = document.getElementById("adjust-toggle");
-const adjustBody = document.getElementById("adjust-body");
 const adjustNote = document.getElementById("adjust-note");
+const adjustModal = document.getElementById("adjust-modal");
+const adjustModalNote = document.getElementById("adjust-modal-note");
+const adjustClose = document.getElementById("adjust-close");
 const adjustHours = document.getElementById("adjust-hours");
 const adjustMinutes = document.getElementById("adjust-minutes");
 const adjustAdd = document.getElementById("adjust-add");
@@ -44,6 +46,8 @@ let activeTaskId = null;
 let longPressTimer = null;
 let longPressTaskId = null;
 let pendingDeleteId = null;
+let adjustPressTimer = null;
+let lastAdjustPointerType = null;
 
 function loadTasks() {
   const raw = localStorage.getItem(STORAGE_KEYS.tasks);
@@ -125,13 +129,28 @@ function resetAdjustInputs() {
   adjustMinutes.value = "0";
 }
 
-function setAdjustExpanded(expanded) {
-  if (!adjustPanel || !adjustToggle || !adjustBody) {
+function clearAdjustPress() {
+  if (adjustPressTimer) {
+    clearTimeout(adjustPressTimer);
+    adjustPressTimer = null;
+  }
+}
+
+function updateBodyModalState() {
+  const hasConfirmOpen = confirmModal && !confirmModal.classList.contains("is-hidden");
+  const hasAdjustOpen = adjustModal && !adjustModal.classList.contains("is-hidden");
+  document.body.classList.toggle("is-modal-open", hasConfirmOpen || hasAdjustOpen);
+}
+
+function setAdjustModalOpen(open) {
+  if (!adjustModal) {
     return;
   }
-  adjustPanel.classList.toggle("is-open", expanded);
-  adjustToggle.setAttribute("aria-expanded", String(expanded));
-  adjustBody.hidden = !expanded;
+  adjustModal.classList.toggle("is-hidden", !open);
+  if (adjustToggle) {
+    adjustToggle.setAttribute("aria-expanded", String(open));
+  }
+  updateBodyModalState();
 }
 
 function setAdjustDisabled(disabled) {
@@ -146,7 +165,7 @@ function setAdjustDisabled(disabled) {
     adjustPanel.classList.toggle("is-disabled", disabled);
   }
   if (disabled) {
-    setAdjustExpanded(false);
+    setAdjustModalOpen(false);
   }
 }
 
@@ -288,13 +307,13 @@ function openDeleteModal(taskId) {
   const extra = isRunning ? " 当前任务正在计时，删除会自动停止。" : "";
   modalBody.textContent = `将永久删除“${task.name}”，累计时长会被清除。${extra}`;
   confirmModal.classList.remove("is-hidden");
-  document.body.classList.add("is-modal-open");
+  updateBodyModalState();
 }
 
 function closeDeleteModal() {
   confirmModal.classList.add("is-hidden");
-  document.body.classList.remove("is-modal-open");
   pendingDeleteId = null;
+  updateBodyModalState();
 }
 
 function ensureActiveTask() {
@@ -347,6 +366,9 @@ function renderTimer() {
     if (adjustNote) {
       adjustNote.textContent = hasTasks ? "请选择任务后可调整" : "先创建任务";
     }
+    if (adjustModalNote) {
+      adjustModalNote.textContent = hasTasks ? "请选择任务后可调整" : "先创建任务";
+    }
     setAdjustDisabled(true);
     return;
   }
@@ -373,8 +395,13 @@ function renderTimer() {
 
   startButton.disabled = isRunningThis || hasOtherRunning;
   stopButton.disabled = !isRunningThis;
+  const toggleNoteText = timerState.running ? "停止计时后可调整" : "";
+  const modalNoteText = timerState.running ? "停止计时后可调整" : "可手动补记或扣除";
   if (adjustNote) {
-    adjustNote.textContent = timerState.running ? "停止计时后可调整" : "可手动补记或扣除";
+    adjustNote.textContent = toggleNoteText;
+  }
+  if (adjustModalNote) {
+    adjustModalNote.textContent = modalNoteText;
   }
   setAdjustDisabled(timerState.running);
 }
@@ -481,7 +508,14 @@ modalConfirm.addEventListener("click", () => {
 });
 
 document.addEventListener("keydown", (event) => {
-  if (event.key === "Escape" && !confirmModal.classList.contains("is-hidden")) {
+  if (event.key !== "Escape") {
+    return;
+  }
+  if (adjustModal && !adjustModal.classList.contains("is-hidden")) {
+    setAdjustModalOpen(false);
+    return;
+  }
+  if (!confirmModal.classList.contains("is-hidden")) {
     closeDeleteModal();
   }
 });
@@ -543,12 +577,64 @@ adjustHours.addEventListener("change", normalizeAdjustInputs);
 adjustMinutes.addEventListener("change", normalizeAdjustInputs);
 
 if (adjustToggle) {
+  adjustToggle.addEventListener("pointerdown", (event) => {
+    if (adjustToggle.disabled) {
+      return;
+    }
+    lastAdjustPointerType = event.pointerType || null;
+    clearAdjustPress();
+    if (event.pointerType === "touch") {
+      adjustPressTimer = window.setTimeout(() => {
+        setAdjustModalOpen(true);
+        clearAdjustPress();
+      }, 450);
+    }
+  });
+
+  adjustToggle.addEventListener("pointerup", () => {
+    clearAdjustPress();
+  });
+
+  adjustToggle.addEventListener("pointerleave", () => {
+    clearAdjustPress();
+  });
+
+  adjustToggle.addEventListener("pointercancel", () => {
+    clearAdjustPress();
+  });
+
   adjustToggle.addEventListener("click", () => {
     if (adjustToggle.disabled) {
       return;
     }
-    const isOpen = adjustPanel ? adjustPanel.classList.contains("is-open") : false;
-    setAdjustExpanded(!isOpen);
+    if (lastAdjustPointerType === "touch") {
+      return;
+    }
+    setAdjustModalOpen(true);
+  });
+
+  adjustToggle.addEventListener("keydown", (event) => {
+    if (adjustToggle.disabled) {
+      return;
+    }
+    if (event.key === "Enter" || event.key === " ") {
+      event.preventDefault();
+      setAdjustModalOpen(true);
+    }
+  });
+}
+
+if (adjustModal) {
+  adjustModal.addEventListener("click", (event) => {
+    if (event.target.matches("[data-adjust-close]")) {
+      setAdjustModalOpen(false);
+    }
+  });
+}
+
+if (adjustClose) {
+  adjustClose.addEventListener("click", () => {
+    setAdjustModalOpen(false);
   });
 }
 
@@ -598,6 +684,6 @@ if (timerState.running) {
   showView("timer");
 }
 renderTimer();
-setAdjustExpanded(false);
+setAdjustModalOpen(false);
 updateTitle();
 setInterval(tick, 1000);

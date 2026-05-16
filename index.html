@@ -65,6 +65,20 @@
             </div>
 
             <div id="timer-card" class="timer-card">
+              <div class="adjust-panel" id="adjust-panel">
+                <button
+                  id="adjust-toggle"
+                  class="adjust-toggle"
+                  type="button"
+                  aria-expanded="false"
+                  aria-controls="adjust-modal"
+                >
+                  <span class="adjust-toggle-main">
+                    <span class="adjust-title">手动调整</span>
+                  </span>
+                  <span class="adjust-note" id="adjust-note">停止计时后可调整</span>
+                </button>
+              </div>
               <div id="timer-progress" class="timer-progress">
                 <div class="progress-core">
                   <div class="session-time" id="session-time">00:00:00</div>
@@ -83,53 +97,6 @@
                 </div>
               </div>
               <div id="timer-hint" class="hint"></div>
-              <div class="adjust-panel" id="adjust-panel">
-                <button
-                  id="adjust-toggle"
-                  class="adjust-toggle"
-                  type="button"
-                  aria-expanded="false"
-                  aria-controls="adjust-body"
-                >
-                  <span class="adjust-toggle-main">
-                    <span class="adjust-title">手动调整</span>
-                    <span class="adjust-chevron" aria-hidden="true"></span>
-                  </span>
-                  <span class="adjust-note" id="adjust-note">停止计时后可调整</span>
-                </button>
-                <div class="adjust-body" id="adjust-body" hidden>
-                  <div class="adjust-inputs">
-                    <label>
-                      <span>小时</span>
-                      <input
-                        id="adjust-hours"
-                        type="number"
-                        min="0"
-                        max="999"
-                        step="1"
-                        inputmode="numeric"
-                        value="0"
-                      />
-                    </label>
-                    <label>
-                      <span>分钟</span>
-                      <input
-                        id="adjust-minutes"
-                        type="number"
-                        min="0"
-                        max="59"
-                        step="1"
-                        inputmode="numeric"
-                        value="0"
-                      />
-                    </label>
-                  </div>
-                  <div class="adjust-actions">
-                    <button id="adjust-add" class="ghost" type="button">加到累计</button>
-                    <button id="adjust-subtract" class="ghost" type="button">从累计扣除</button>
-                  </div>
-                </div>
-              </div>
               <div class="timer-actions">
                 <button id="start-button" class="primary">开始计时</button>
                 <button id="stop-button" class="secondary">停止并记录</button>
@@ -161,6 +128,57 @@
         <div class="modal-actions">
           <button id="modal-cancel" class="ghost">取消</button>
           <button id="modal-confirm" class="secondary">删除</button>
+        </div>
+      </div>
+    </div>
+
+    <div
+      id="adjust-modal"
+      class="modal is-hidden"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="adjust-modal-title"
+    >
+      <div class="modal-backdrop" data-adjust-close></div>
+      <div class="modal-panel" role="document">
+        <div class="modal-header">
+          <h3 id="adjust-modal-title">手动调整</h3>
+          <p class="muted" id="adjust-modal-note">停止计时后可调整</p>
+        </div>
+        <div class="adjust-body">
+          <div class="adjust-inputs">
+            <label>
+              <span>小时</span>
+              <input
+                id="adjust-hours"
+                type="number"
+                min="0"
+                max="999"
+                step="1"
+                inputmode="numeric"
+                value="0"
+              />
+            </label>
+            <label>
+              <span>分钟</span>
+              <input
+                id="adjust-minutes"
+                type="number"
+                min="0"
+                max="59"
+                step="1"
+                inputmode="numeric"
+                value="0"
+              />
+            </label>
+          </div>
+          <div class="adjust-actions">
+            <button id="adjust-add" class="ghost" type="button">加到累计</button>
+            <button id="adjust-subtract" class="ghost" type="button">从累计扣除</button>
+          </div>
+        </div>
+        <div class="modal-actions">
+          <button id="adjust-close" class="ghost" type="button">关闭</button>
         </div>
       </div>
     </div>

@@ -1,4 +1,4 @@
-const CACHE = "300hours-v1";
+const CACHE = "300hours-v1.01";
 
 const STATIC_ASSETS = [
   "/",

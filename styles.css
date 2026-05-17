@@ -32,11 +32,7 @@ textarea,
 html,
 body {
   height: 100%;
-}
-
-html,
-body {
-  height: 100%;
+  overscroll-behavior: none;
 }
 
 body {
@@ -45,7 +41,6 @@ body {
   color: var(--ink);
   background: radial-gradient(circle at top, #fff6e7 0%, var(--bg-1) 45%, var(--bg-2) 100%);
   min-height: 100vh;
-  overflow: hidden;
   overflow: hidden;
 }
 
@@ -86,14 +81,6 @@ body.is-timer .hero {
   display: flex;
   flex-direction: column;
   gap: 20px;
-  height: 100vh;
-  height: 100dvh;
-}
-
-.app main {
-  flex: 1;
-  display: flex;
-  min-height: 0;
   height: 100vh;
   height: 100dvh;
 }
@@ -429,7 +416,6 @@ button:active {
   display: grid;
   place-items: center;
   box-shadow: inset 0 0 0 1px rgba(31, 29, 25, 0.08);
-  margin-top: 5px;
   margin-top: 5px;
 }
 

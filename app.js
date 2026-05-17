@@ -59,8 +59,11 @@ function setupPullToRefreshBlock() {
     return;
   }
 
+  const scrollRoot = document.scrollingElement || document.documentElement;
+  const isAtTop = () => (scrollRoot ? scrollRoot.scrollTop <= 0 : window.scrollY <= 0);
+
   // Prevent pull-to-refresh in standalone PWA.
-  window.addEventListener(
+  document.addEventListener(
     "touchstart",
     (event) => {
       if (event.touches.length !== 1) {
@@ -68,29 +71,29 @@ function setupPullToRefreshBlock() {
         return;
       }
       touchStartY = event.touches[0].clientY;
-      shouldBlockPullToRefresh = window.scrollY <= 0;
+      shouldBlockPullToRefresh = isAtTop();
     },
     { passive: true }
   );
 
-  window.addEventListener(
+  document.addEventListener(
     "touchmove",
     (event) => {
       if (!shouldBlockPullToRefresh || event.touches.length !== 1) {
         return;
       }
       const deltaY = event.touches[0].clientY - touchStartY;
-      if (deltaY > 0 && window.scrollY <= 0) {
+      if (deltaY > 0 && isAtTop() && event.cancelable) {
         event.preventDefault();
       }
     },
     { passive: false }
   );
 
-  window.addEventListener("touchend", () => {
+  document.addEventListener("touchend", () => {
     shouldBlockPullToRefresh = false;
   });
-  window.addEventListener("touchcancel", () => {
+  document.addEventListener("touchcancel", () => {
     shouldBlockPullToRefresh = false;
   });
 }

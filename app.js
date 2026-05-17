@@ -46,6 +46,54 @@ let activeTaskId = null;
 let longPressTimer = null;
 let longPressTaskId = null;
 let pendingDeleteId = null;
+let touchStartY = 0;
+let shouldBlockPullToRefresh = false;
+
+function setupPullToRefreshBlock() {
+  const isStandalone =
+    window.matchMedia("(display-mode: standalone)").matches ||
+    window.navigator.standalone === true ||
+    document.referrer.startsWith("android-app://");
+
+  if (!isStandalone) {
+    return;
+  }
+
+  // Prevent pull-to-refresh in standalone PWA.
+  window.addEventListener(
+    "touchstart",
+    (event) => {
+      if (event.touches.length !== 1) {
+        shouldBlockPullToRefresh = false;
+        return;
+      }
+      touchStartY = event.touches[0].clientY;
+      shouldBlockPullToRefresh = window.scrollY <= 0;
+    },
+    { passive: true }
+  );
+
+  window.addEventListener(
+    "touchmove",
+    (event) => {
+      if (!shouldBlockPullToRefresh || event.touches.length !== 1) {
+        return;
+      }
+      const deltaY = event.touches[0].clientY - touchStartY;
+      if (deltaY > 0 && window.scrollY <= 0) {
+        event.preventDefault();
+      }
+    },
+    { passive: false }
+  );
+
+  window.addEventListener("touchend", () => {
+    shouldBlockPullToRefresh = false;
+  });
+  window.addEventListener("touchcancel", () => {
+    shouldBlockPullToRefresh = false;
+  });
+}
 
 function loadTasks() {
   const raw = localStorage.getItem(STORAGE_KEYS.tasks);
@@ -126,6 +174,8 @@ function resetAdjustInputs() {
   adjustHours.value = "0";
   adjustMinutes.value = "0";
 }
+
+setupPullToRefreshBlock();
 
 
 function updateBodyModalState() {
